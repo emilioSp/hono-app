@@ -1,0 +1,45 @@
+{
+  "name": "hono-app",
+  "type": "module",
+  "engines": {
+    "node": "24"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "dev": "node --watch --env-file=.env src/index.ts",
+    "lint": "biome check --fix",
+    "new:migration": "node --env-file=.env ./node_modules/.bin/knex migrate:make -x ts",
+    "migrate": "node --env-file=.env ./node_modules/.bin/knex migrate:latest",
+    "start": "node src/index.ts",
+    "test": "node --env-file=.env ./node_modules/.bin/vitest run --coverage",
+    "test:db:up": "docker compose up postgres -d --wait",
+    "test:db:down": "docker compose down postgres",
+    "test:ci": "npm run test:db:up && npm run migrate && npm run test; npm run test:db:down"
+  },
+  "imports": {
+    "#app": "./src/app.ts",
+    "#config": "./src/config.ts",
+    "#error/*": "./src/error/*",
+    "#mapper/*": "./src/mapper/*",
+    "#repository/*": "./src/repository/*",
+    "#router/*": "./src/router/*",
+    "#schema/*": "./src/schema/*",
+    "#service/*": "./src/service/*"
+  },
+  "dependencies": {
+    "@hono/node-server": "1.19.9",
+    "@hono/zod-validator": "0.7.6",
+    "hono": "4.11.9",
+    "knex": "3.1.0",
+    "pg": "8.18.0",
+    "uuid": "13.0.0",
+    "zod": "4.3.6"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.3.14",
+    "@types/node": "25.2.2",
+    "@vitest/coverage-v8": "4.0.18",
+    "typescript": "5.9.3",
+    "vitest": "4.0.18"
+  }
+}

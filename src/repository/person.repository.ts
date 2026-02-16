@@ -1,5 +1,6 @@
 import type { Knex } from 'knex';
 import { v7 as uuidv7 } from 'uuid';
+import { logger } from '#logger';
 import { getDB } from './db.ts';
 
 type CreatePersonDbInput = {
@@ -20,6 +21,8 @@ export const insertPerson = async (
   data: CreatePersonDbInput,
   trx?: Knex.Transaction,
 ): Promise<PersonRow> => {
+  logger.debug('Inserting person into database', { name: data.name });
+
   const db = getDB(trx);
   const [row] = await db<PersonRow>('people')
     .insert({
@@ -34,6 +37,8 @@ export const insertPerson = async (
 };
 
 export const selectPeople = async (id?: string): Promise<PersonRow[]> => {
+  logger.debug('Selecting people from database', { id: id ?? 'all' });
+
   const db = getDB()('people')
     .select('id', 'name', 'surname', 'age', 'created_at')
     .orderBy('created_at', 'desc');

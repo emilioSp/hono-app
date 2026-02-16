@@ -20,6 +20,7 @@
     "#app": "./src/app.ts",
     "#config": "./src/config.ts",
     "#error/*": "./src/error/*",
+    "#logger": "./src/logger.ts",
     "#mapper/*": "./src/mapper/*",
     "#repository/*": "./src/repository/*",
     "#router/*": "./src/router/*",

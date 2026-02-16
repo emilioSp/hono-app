@@ -21,6 +21,10 @@ describe('Person Router', () => {
       });
 
       expect(response.status).toBe(201);
+      expect(response.headers.get('X-Request-Id')).toBeDefined();
+      expect(response.headers.get('X-Request-Id')).toMatch(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+      );
       const body = await response.json();
       expect(body.data).toMatchObject({
         name: 'John',
@@ -175,8 +179,14 @@ describe('Person Router', () => {
       const response = await app.request(`/person/${nonExistentId}`);
 
       expect(response.status).toBe(404);
+      const requestId = response.headers.get('X-Request-Id');
+      expect(requestId).toBeDefined();
+      expect(requestId).toMatch(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+      );
       const body = await response.json();
       expect(body.error.code).toBe('NOT_FOUND');
+      expect(body.error.requestId).toBe(requestId);
     });
 
     it('returns 400 when id is not a valid uuid', async () => {

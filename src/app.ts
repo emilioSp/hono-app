@@ -1,13 +1,18 @@
+import { randomUUID } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
 import type { Context } from 'hono';
 import { Hono } from 'hono';
-import { requestId } from 'hono/request-id';
 import { AppError } from '#error/app.error.ts';
 import { asyncLocalStorage, logger } from '#logger';
 
 const errorManager = (err: Error, c: Context) => {
   const requestId = asyncLocalStorage.getStore()?.requestId;
-  logger.error('Request failed', err, { requestId });
+
+  logger.error({
+    message: 'Request failed',
+    error: err,
+    data: { requestId },
+  });
 
   if (err instanceof AppError) {
     return c.json(
@@ -37,28 +42,28 @@ const errorManager = (err: Error, c: Context) => {
 
 export const app = new Hono();
 
-app.use(requestId());
-
 app.use(async (c, next) => {
   const startTime = performance.now();
+  const requestId = randomUUID();
 
   await asyncLocalStorage.run(
     {
-      requestId: c.var.requestId,
       startTime,
+      requestId,
       path: c.req.path,
       method: c.req.method,
     },
     async () => {
-      c.header('X-Request-Id', c.var.requestId);
-
       await next();
       const duration = performance.now() - startTime;
       c.header('X-Response-Time', `${duration.toFixed(2)}ms`);
 
-      logger.info('Request completed', {
-        status: c.res.status,
-        duration: `${duration.toFixed(2)}ms`,
+      logger.info({
+        message: 'Request completed',
+        data: {
+          status: c.res.status,
+          duration: `${duration.toFixed(2)}ms`,
+        },
       });
     },
   );

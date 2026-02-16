@@ -7,7 +7,10 @@ import { NotFoundError } from '../error/not-found.error.ts';
 export const createPerson = async (
   input: CreatePersonInput,
 ): Promise<PersonSchema> => {
-  logger.debug('Creating person', { name: input.name, surname: input.surname });
+  logger.debug({
+    message: 'Creating person',
+    data: { name: input.name, surname: input.surname },
+  });
 
   const personRow = await insertPerson({
     name: input.name,
@@ -20,7 +23,7 @@ export const createPerson = async (
 };
 
 export const listPeople = async (): Promise<PersonSchema[]> => {
-  logger.debug('Listing all people');
+  logger.debug({ message: 'Listing all people' });
 
   const peopleRows = await selectPeople();
   const people = peopleRows.map(mapPersonRowToPerson);
@@ -29,12 +32,12 @@ export const listPeople = async (): Promise<PersonSchema[]> => {
 };
 
 export const getPerson = async (id: string): Promise<PersonSchema> => {
-  logger.debug('Getting person by id', { personId: id });
+  logger.debug({ message: 'Getting person by id', data: { personId: id } });
 
   const personRow = await selectPeople(id);
 
   if (personRow.length === 0) {
-    logger.warn('Person not found', { personId: id });
+    logger.warn({ message: 'Person not found', data: { personId: id } });
     throw new NotFoundError({
       message: `Person with id ${id} not found`,
       context: { id },

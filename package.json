@@ -6,7 +6,7 @@
   },
   "scripts": {
     "build": "tsc --noEmit",
-    "dev": "node --watch --env-file=.env src/index.ts",
+    "dev": "LOG_LEVEL=debug node --watch --env-file=.env src/index.ts",
     "lint": "biome check --fix",
     "new:migration": "node --env-file=.env ./node_modules/.bin/knex migrate:make -x ts",
     "migrate": "node --env-file=.env ./node_modules/.bin/knex migrate:latest",

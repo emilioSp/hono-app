@@ -21,7 +21,10 @@ export const insertPerson = async (
   data: CreatePersonDbInput,
   trx?: Knex.Transaction,
 ): Promise<PersonRow> => {
-  logger.debug('Inserting person into database', { name: data.name });
+  logger.debug({
+    message: 'Inserting person into database',
+    data: { name: data.name, surname: data.surname, age: data.age ?? null },
+  });
 
   const db = getDB(trx);
   const [row] = await db<PersonRow>('people')
@@ -37,7 +40,10 @@ export const insertPerson = async (
 };
 
 export const selectPeople = async (id?: string): Promise<PersonRow[]> => {
-  logger.debug('Selecting people from database', { id: id ?? 'all' });
+  logger.debug({
+    message: 'Selecting people from database',
+    data: { id: id ?? 'all' },
+  });
 
   const db = getDB()('people')
     .select('id', 'name', 'surname', 'age', 'created_at')

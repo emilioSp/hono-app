@@ -1,10 +1,11 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 
 export type RequestContext = {
-  requestId: string;
-  startTime: number;
+  requestId?: string;
+  startTime?: number;
   path?: string;
   method?: string;
+  [key: string]: unknown;
 };
 
 export const asyncLocalStorage = new AsyncLocalStorage<RequestContext>();
@@ -51,20 +52,75 @@ const formatLog = (level: LogLevel, payload: LogPayload): string => {
   return JSON.stringify(logObject);
 };
 
+const LOG_LEVEL_PRIORITY: Record<LogLevel, number> = {
+  debug: 0,
+  info: 1,
+  warn: 2,
+  error: 3,
+} as const;
+
+const getConfiguredLogLevel = (): LogLevel => {
+  const level = process.env.LOG_LEVEL?.toLowerCase();
+  if (
+    level === 'debug' ||
+    level === 'info' ||
+    level === 'warn' ||
+    level === 'error'
+  ) {
+    return level;
+  }
+  return 'warn'; // Default: only warn and error
+};
+
+const shouldLog = (level: LogLevel): boolean => {
+  const configuredLevel = getConfiguredLogLevel();
+  return LOG_LEVEL_PRIORITY[level] >= LOG_LEVEL_PRIORITY[configuredLevel];
+};
+
 export const logger = {
-  debug: (message: string, data?: Record<string, unknown>) => {
-    console.debug(formatLog('debug', { message, data }));
+  debug: ({
+    message,
+    data,
+  }: {
+    message: string;
+    data?: Record<string, unknown>;
+  }) => {
+    if (shouldLog('debug')) {
+      console.debug(formatLog('debug', { message, data }));
+    }
   },
 
-  info: (message: string, data?: Record<string, unknown>) => {
-    console.info(formatLog('info', { message, data }));
+  info: ({
+    message,
+    data,
+  }: {
+    message: string;
+    data?: Record<string, unknown>;
+  }) => {
+    if (shouldLog('info')) {
+      console.info(formatLog('info', { message, data }));
+    }
   },
 
-  warn: (message: string, data?: Record<string, unknown>) => {
+  warn: ({
+    message,
+    data,
+  }: {
+    message: string;
+    data?: Record<string, unknown>;
+  }) => {
     console.warn(formatLog('warn', { message, data }));
   },
 
-  error: (message: string, error?: Error, data?: Record<string, unknown>) => {
+  error: ({
+    message,
+    error,
+    data,
+  }: {
+    message: string;
+    error?: Error;
+    data?: Record<string, unknown>;
+  }) => {
     console.error(formatLog('error', { message, error, data }));
   },
 };

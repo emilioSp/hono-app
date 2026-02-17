@@ -49,7 +49,21 @@ const formatLog = (level: LogLevel, payload: LogPayload): string => {
     };
   }
 
-  return JSON.stringify(logObject);
+  const logCache = new Set();
+
+  const log = JSON.stringify(logObject, (_, value) => {
+    if (typeof value === 'object' && value !== null) {
+      if (logCache.has(value)) {
+        return;
+      }
+      logCache.add(value);
+    }
+    return value;
+  });
+
+  logCache.clear();
+
+  return log;
 };
 
 const LOG_LEVEL_PRIORITY: Record<LogLevel, number> = {

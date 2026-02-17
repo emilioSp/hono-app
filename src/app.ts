@@ -63,6 +63,7 @@ app.use(async (c, next) => {
         data: {
           status: c.res.status,
           duration: `${duration.toFixed(2)}ms`,
+          slow: duration > 3_000,
         },
       });
     },

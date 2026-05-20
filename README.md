@@ -8,6 +8,9 @@ This application provides a REST API to:
 - Create people with name, surname, and optional age
 - List all people ordered by creation date
 - Health check endpoint
+- Browse the interactive API docs at `/doc`
+- Access the machine-readable OpenAPI 3.1 spec at `/openapi.json`
+- Access LLM-friendly API docs at `/llms.txt`
 
 ## Prerequisites
 
@@ -63,7 +66,7 @@ Response:
 }
 ```
 
-### Create a PersonSchema
+### Create a Person
 ```bash
 curl -X POST http://localhost:3000/person \
   -H "Content-Type: application/json" \
@@ -87,7 +90,7 @@ Response (201 Created):
 }
 ```
 
-### Create a PersonSchema without age
+### Create a Person without age
 ```bash
 curl -X POST http://localhost:3000/person \
   -H "Content-Type: application/json" \
@@ -152,9 +155,26 @@ Response (400 Bad Request):
 {
   "error": {
     "code": "BAD_REQUEST",
-    "message": "Invalid person payload"
+    "message": "Validation failed"
   }
 }
+```
+
+## API Documentation
+
+### Interactive docs (Scalar UI)
+```
+http://localhost:3000/doc
+```
+
+### OpenAPI 3.1 spec
+```bash
+curl http://localhost:3000/openapi.json
+```
+
+### LLM-friendly docs
+```bash
+curl http://localhost:3000/llms.txt
 ```
 
 ## Local testing

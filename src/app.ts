@@ -69,6 +69,7 @@ app.use(async (c, next) => {
     async () => {
       await next();
       const duration = performance.now() - startTime;
+      c.header('X-Request-Id', requestId);
       c.header('X-Response-Time', `${duration.toFixed(2)}ms`);
 
       logger.info({

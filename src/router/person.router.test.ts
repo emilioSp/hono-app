@@ -195,4 +195,18 @@ describe('Person Router', () => {
       expect(response.status).toBe(400);
     });
   });
+
+  describe('GET /openapi.json', () => {
+    it('returns a valid OpenAPI 3.1 document', async () => {
+      const response = await app.request('/openapi.json');
+
+      expect(response.status).toBe(200);
+      const body = await response.json();
+      expect(body.openapi).toBe('3.1.0');
+      expect(body.info.title).toBe('Hono App API');
+      expect(body.paths['/person']).toBeDefined();
+      expect(body.paths['/people']).toBeDefined();
+      expect(body.paths['/person/{id}']).toBeDefined();
+    });
+  });
 });

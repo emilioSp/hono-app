@@ -10,7 +10,7 @@ export const createPersonInputSchema = z
 
 export const personIdSchema = z.object({
   id: z.uuidv7(),
-});
+}).openapi('PersonId');
 
 export const personSchema = createPersonInputSchema
   .extend({

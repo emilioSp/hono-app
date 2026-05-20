@@ -1,5 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
+import { apiReference } from '@scalar/hono-api-reference';
+import { createMarkdownFromOpenApi } from '@scalar/openapi-to-markdown';
 import { OpenAPIHono } from '@hono/zod-openapi';
 import type { Context } from 'hono';
 import { AppError } from '#error/app.error.ts';
@@ -92,6 +94,21 @@ app.doc31('/openapi.json', {
     title: 'Hono App API',
     version: '1.0.0',
   },
+});
+
+app.use('/docs', apiReference({ url: '/openapi.json' }));
+
+let llmsTxtCache: string | null = null;
+
+app.get('/llms.txt', async (c) => {
+  if (!llmsTxtCache) {
+    const spec = app.getOpenAPI31Document({
+      openapi: '3.1.0',
+      info: { title: 'Hono App API', version: '1.0.0' },
+    });
+    llmsTxtCache = await createMarkdownFromOpenApi(JSON.stringify(spec));
+  }
+  return c.text(llmsTxtCache!);
 });
 
 export default app;
